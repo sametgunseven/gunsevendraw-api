@@ -6,7 +6,7 @@ import projectRoutes from './routes/projectRoutes'; // YENİ EKLENDİ
 dotenv.config();
 
 const app: Application = express();
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5001; // "Render port verirse onu kullan, yoksa 5001 kullan"
 
 // GÜVENLİK VE AYARLAR
 app.use(cors());

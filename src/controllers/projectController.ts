@@ -34,6 +34,7 @@ export const ProjectController = {
       res.status(500).json({ success: false, error: error.message });
     }
   },
+
   // DELETE: Projeyi sil
   async delete(req: Request, res: Response) {
     try {
@@ -43,4 +44,5 @@ export const ProjectController = {
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }
-  };
+  }
+};
