@@ -33,7 +33,7 @@ export const ProjectController = {
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }
-  },
+  }, // <-- DİKKAT: İşte eksik olan veya yanlış yazılan virgül buradaydı muhtemelen!
 
   // DELETE: Projeyi sil
   async delete(req: Request, res: Response) {
@@ -45,4 +45,4 @@ export const ProjectController = {
       res.status(500).json({ success: false, error: error.message });
     }
   }
-};
+}; // <-- OBJENİN KAPANIŞI BURADA!
