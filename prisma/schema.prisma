@@ -15,6 +15,11 @@ model Project {
   parcelInfo   String?  
   projectDate  String?  
   projectData  String  
+  
+  // YENİ EKLENEN KİMLİK KARTLARI (Eski projeler hata vermesin diye varsayılan değer atadık)
+  userId       String   @default("anonim")
+  userEmail    String   @default("bilinmiyor")
+
   createdAt    DateTime @default(now()) 
   updatedAt    DateTime @updatedAt      
 }

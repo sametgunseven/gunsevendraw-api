@@ -2,40 +2,37 @@ import { Request, Response } from 'express';
 import { ProjectService } from '../services/projectService';
 
 export const ProjectController = {
-  // POST: Yeni proje kaydet
   async save(req: Request, res: Response) {
     try {
-      const projectData = req.body;
-      const result = await ProjectService.saveProject(projectData);
+      // Artık frontend'den payload geliyor: { projectData, userEmail, userId }
+      const result = await ProjectService.saveProject(req.body);
       res.status(201).json({ success: true, message: "Proje başarıyla kaydedildi!", data: result.project });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }
   },
 
-  // GET: Projeleri listele
   async getAll(req: Request, res: Response) {
     try {
-      const result = await ProjectService.getAllProjects();
+      // API İsteğinden soran kişinin mailini alıyoruz
+      const userEmail = (req.query.email as string) || "bilinmiyor";
+      const result = await ProjectService.getAllProjects(userEmail);
       res.status(200).json(result);
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }
   },
 
-  // GET: Tekil proje detayını getir
   async getById(req: Request, res: Response) {
     try {
       const id = req.params.id as string; 
-      
       const result = await ProjectService.getProjectById(id);
       res.status(200).json(result);
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });
     }
-  }, // <-- DİKKAT: İşte eksik olan veya yanlış yazılan virgül buradaydı muhtemelen!
+  },
 
-  // DELETE: Projeyi sil
   async delete(req: Request, res: Response) {
     try {
       const id = req.params.id as string;
@@ -45,4 +42,4 @@ export const ProjectController = {
       res.status(500).json({ success: false, error: error.message });
     }
   }
-}; // <-- OBJENİN KAPANIŞI BURADA!
+};
