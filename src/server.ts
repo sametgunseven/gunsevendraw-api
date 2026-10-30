@@ -2,6 +2,7 @@ import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import projectRoutes from './routes/projectRoutes'; // YENİ EKLENDİ
+import prisma from './config/db';
 
 dotenv.config();
 
@@ -53,7 +54,6 @@ if (process.env.STAGING_DIAGNOSTICS === 'true') {
     console.info('STAGING_CONFIGURED_FLAGS', JSON.stringify(configured));
 
     try {
-      const { default: prisma } = await import('./config/db');
       await prisma.$queryRaw`SELECT 1`;
       console.info('STAGING_DATABASE_CHECK=OK');
     } catch (error) {
