@@ -1,45 +1,45 @@
 import { Request, Response } from 'express';
 import { ProjectService } from '../services/projectService';
+import type { AuthenticatedUser } from '../security/projectAccess';
+
+const currentUser = (req: Request): AuthenticatedUser => {
+  if (!req.authenticatedUser) throw new Error('Kimlik doğrulanmadı');
+  return req.authenticatedUser;
+};
+
+const handleError = (res: Response, error: unknown) => {
+  const message = error instanceof Error ? error.message : '';
+  if (message === 'PROJECT_NOT_FOUND') {
+    res.status(404).json({ success: false, error: 'Proje bulunamadı.' });
+  } else {
+    console.error('Project request failed:', error);
+    res.status(500).json({ success: false, error: 'İşlem gerçekleştirilemedi.' });
+  }
+};
 
 export const ProjectController = {
   async save(req: Request, res: Response) {
     try {
-      // Artık frontend'den payload geliyor: { projectData, userEmail, userId }
-      const result = await ProjectService.saveProject(req.body);
-      res.status(201).json({ success: true, message: "Proje başarıyla kaydedildi!", data: result.project });
-    } catch (error: any) {
-      res.status(500).json({ success: false, error: error.message });
-    }
+      const result = await ProjectService.saveProject(req.body, currentUser(req));
+      res.status(201).json({ success: true, message: 'Proje başarıyla kaydedildi!', data: result.project });
+    } catch (error) { handleError(res, error); }
   },
 
   async getAll(req: Request, res: Response) {
     try {
-      // API İsteğinden soran kişinin mailini alıyoruz
-      const userEmail = (req.query.email as string) || "bilinmiyor";
-      const result = await ProjectService.getAllProjects(userEmail);
-      res.status(200).json(result);
-    } catch (error: any) {
-      res.status(500).json({ success: false, error: error.message });
-    }
+      res.status(200).json(await ProjectService.getAllProjects(currentUser(req)));
+    } catch (error) { handleError(res, error); }
   },
 
   async getById(req: Request, res: Response) {
     try {
-      const id = req.params.id as string; 
-      const result = await ProjectService.getProjectById(id);
-      res.status(200).json(result);
-    } catch (error: any) {
-      res.status(500).json({ success: false, error: error.message });
-    }
+      res.status(200).json(await ProjectService.getProjectById(req.params.id as string, currentUser(req)));
+    } catch (error) { handleError(res, error); }
   },
 
   async delete(req: Request, res: Response) {
     try {
-      const id = req.params.id as string;
-      const result = await ProjectService.deleteProject(id);
-      res.status(200).json(result);
-    } catch (error: any) {
-      res.status(500).json({ success: false, error: error.message });
-    }
+      res.status(200).json(await ProjectService.deleteProject(req.params.id as string, currentUser(req)));
+    } catch (error) { handleError(res, error); }
   }
 };

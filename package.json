@@ -1,16 +1,14 @@
 {
   "name": "gunsevendraw-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "GunsevenDraw authenticated project API",
+  "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js"
+    "build": "prisma generate && tsc",
+    "start": "node dist/server.js",
+    "test": "npm run build && node --test dist/security/*.test.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "type": "commonjs",
   "dependencies": {
     "@prisma/client": "^6.19.3",
