@@ -32,3 +32,37 @@ app.listen(PORT, () => {
   console.log(`📡 Port: ${PORT}`);
   console.log(`=================================`);
 });
+
+/**
+ * Staging-only startup diagnostics: checks configuration presence and a read-only
+ * database SELECT. No connection strings, tokens, or customer data are logged.
+ * Enable explicitly with STAGING_DIAGNOSTICS=true on the staging Render service.
+ */
+if (process.env.STAGING_DIAGNOSTICS === 'true') {
+  void (async () => {
+    const configured = {
+      databaseUrl: Boolean(process.env.DATABASE_URL),
+      directUrl: Boolean(process.env.DIRECT_URL),
+      supabaseUrl: Boolean(process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL),
+      publishableKey: Boolean(
+        process.env.SUPABASE_PUBLISHABLE_KEY ||
+        process.env.SUPABASE_ANON_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      ),
+    };
+    console.info('STAGING_CONFIGURED_FLAGS', JSON.stringify(configured));
+
+    try {
+      const { default: prisma } = await import('./config/db');
+      await prisma.$queryRaw`SELECT 1`;
+      console.info('STAGING_DATABASE_CHECK=OK');
+    } catch (error) {
+      const errorCode =
+        typeof error === 'object' && error !== null && 'code' in error &&
+        typeof error.code === 'string' && /^P[0-9]{4}$/.test(error.code)
+          ? error.code
+          : 'UNCLASSIFIED';
+      console.error('STAGING_DATABASE_CHECK=FAILED', errorCode);
+    }
+  })();
+}
